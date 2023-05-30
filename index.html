@@ -12,6 +12,11 @@
     <script type="module">
       import * as jose from 'https://cdnjs.cloudflare.com/ajax/libs/jose/4.14.4/index.bundle.min.js';
 
+      const secret = new TextEncoder().encode(
+          'cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2',
+      )
+      const alg = 'HS256'
+
       const authClient = new OktaAuth({
         clientId: "0oa8ax6dbllrDchri1d7",
         redirectUri: "https://multi.phi1ipp.com",
@@ -32,9 +37,9 @@
         // User is authenticated
         console.log("user authenticated");
         
-        fetch('https://okta.phi1ipp.com/api/v1/users/me/groups', {credentials: "include"})
+        await fetch('https://okta.phi1ipp.com/api/v1/users/me/groups', {credentials: "include"})
           .then(rsp => rsp.json())
-          .then(data => {
+          .then(async data => {
             const filteredGrps = data
                 .filter(grp => grp.profile.name.startsWith('ORG - '))
                 .map(grp => grp.profile.name)
@@ -43,24 +48,18 @@
 
             document.getElementById('groups').innerHTML = 
                 '<select>'
-                + filteredGrps.map(grpName => `<option>${grpName}</option>`).join()
+                + await filteredGrps.map(async grpName => {
+
+                    const jwt = await new jose.SignJWT({ 'org': true })
+                        .setProtectedHeader({ alg })
+                        .setIssuedAt()
+                        .setIssuer('urn:example:issuer')
+                        .setAudience('urn:example:audience')
+                        .setExpirationTime('2h')
+                        .sign(secret);
+
+                    `<option value=${jwt}>${grpName}</option>`}).join()
                 + '</select>'
-
-            const secret = new TextEncoder().encode(
-                'cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2',
-            )
-            const alg = 'HS256'
-
-            new jose.SignJWT({ 'urn:example:claim': true })
-                .setProtectedHeader({ alg })
-                .setIssuedAt()
-                .setIssuer('urn:example:issuer')
-                .setAudience('urn:example:audience')
-                .setExpirationTime('2h')
-                .sign(secret)
-                .then(jwt => {
-                    console.log(jwt)
-                })
           })
           .catch(err => {
             console.err(err)
