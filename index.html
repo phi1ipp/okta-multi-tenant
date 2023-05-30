@@ -46,10 +46,8 @@
 
             console.log('groups', filteredGrps)
 
-            document.getElementById('groups').innerHTML = 
-                '<select>'
-                + await filteredGrps.map(async grpName => {
-
+            const options = 
+                await filteredGrps.map(async grpName => {
                     const jwt = await new jose.SignJWT({ 'org': true })
                         .setProtectedHeader({ alg })
                         .setIssuedAt()
@@ -58,7 +56,12 @@
                         .setExpirationTime('2h')
                         .sign(secret);
 
-                    `<option value=${jwt}>${grpName}</option>`}).join()
+                    return `<option value=${jwt}>${grpName}</option>`
+                });
+
+            document.getElementById('groups').innerHTML = 
+                '<select>'
+                + options.join();
                 + '</select>'
           })
           .catch(err => {
