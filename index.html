@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      src="https://global.oktacdn.com/okta-auth-js/7.2.0/okta-auth-js.min.js"
+      type="text/javascript"
+    ></script>
+  </head>
+
+  <body>
+    <script type="module">
+      const authClient = new OktaAuth({
+        clientId: "0oa8ax6dbllrDchri1d7",
+        redirectUri: "https://seed-spiky-condor.glitch.me",
+        issuer: "https://okta.phi1ipp.com",
+        responseType: "code",
+      });
+
+      
+      if (authClient.isLoginRedirect()) {
+        try {
+          await authClient.handleLoginRedirect();
+        } catch (e) {
+          console.error(e);
+        }
+      } else if (!(await authClient.isAuthenticated())) {
+        console.log('original URL', window.location.href);
+        authClient.signInWithRedirect();
+      } else {
+        // User is authenticated
+        console.log("user authenticated");
+        
+        fetch('https://okta.phi1ipp.com/api/v1/users/me/groups', {credentials: "include"})
+          .then(rsp => rsp.json())
+          .then(data => {
+            console.log(data);
+          })
+          .catch(err => {
+            console.err(err)
+          })
+      }
+    </script>
+  </body>
+</html>
