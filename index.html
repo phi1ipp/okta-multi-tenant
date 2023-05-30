@@ -40,7 +40,10 @@
 
             console.log('groups', filteredGrps)
 
-            document.getElementById('groups').innerHTML = filteredGrps.map(grpName => `<li>${grpName}</li>`)
+            document.getElementById('groups').innerHTML = 
+                '<select>'
+                + filteredGrps.map(grpName => `<option>${grpName}</option>`).join()
+                + '</select>'
           })
           .catch(err => {
             console.err(err)
