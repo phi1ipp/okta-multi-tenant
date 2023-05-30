@@ -8,6 +8,7 @@
   </head>
 
   <body>
+    <div id="groups"></div>
     <script type="module">
       const authClient = new OktaAuth({
         clientId: "0oa8ax6dbllrDchri1d7",
@@ -33,7 +34,13 @@
         fetch('https://okta.phi1ipp.com/api/v1/users/me/groups', {credentials: "include"})
           .then(rsp => rsp.json())
           .then(data => {
-            console.log(data);
+            const filteredGrps = data
+                .filger(grp => grp.profile.name.startsWith('ORG - '))
+                .map(grp => grp.profile.name)
+
+            console.log('groups', filteredGrps)
+
+            document.getElementById('groups').innerHTML = filteredGrps.map(grpName => `<li>${grpName}</li>`)
           })
           .catch(err => {
             console.err(err)
