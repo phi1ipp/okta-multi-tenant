@@ -9,6 +9,7 @@
 
   <body>
     <div id="groups"></div>
+    <button id="login">Login</button>
     <script type="module">
       import * as jose from 'https://cdnjs.cloudflare.com/ajax/libs/jose/4.14.4/index.bundle.min.js';
 
@@ -63,7 +64,7 @@
             console.log('options', options)
 
             document.getElementById('groups').innerHTML = 
-                '<select>'
+                '<select id="select">'
                 + options.join();
                 + '</select>'
           })
@@ -71,6 +72,14 @@
             console.err(err)
           })
       }
+
+      document.getElementById('login').addEventListener('click', () => {
+        const option = document.getElementById('select').selectedOptions[0];
+
+        const redirUrl = okta_sso_url + `?RelayState=${option}`;
+
+        window.location.href = redirUrl;
+      })
     </script>
   </body>
 </html>
