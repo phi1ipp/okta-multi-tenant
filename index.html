@@ -46,12 +46,10 @@
                 .filter(grp => grp.profile.name.startsWith('ORG - '))
                 .map(grp => grp.profile.name)
 
-            console.log('groups', filteredGrps)
-
             const options = 
               await Promise.all(
                 filteredGrps.map(async grpName => {
-                    const jwt = await new jose.SignJWT({ 'org': true })
+                    const jwt = await new jose.SignJWT({ 'grp': grpName })
                         .setProtectedHeader({ alg })
                         .setIssuedAt()
                         .setIssuer('urn:example:issuer')
@@ -61,7 +59,6 @@
 
                     return `<option value=${jwt}>${grpName}</option>`
                 }));
-            console.log('options', options)
 
             document.getElementById('groups').innerHTML = 
                 '<select id="select">'
@@ -76,7 +73,7 @@
       document.getElementById('login').addEventListener('click', () => {
         const option = document.getElementById('select').selectedOptions[0];
 
-        const redirUrl = okta_sso_url + `?RelayState=${option}`;
+        const redirUrl = okta_sso_url + `?RelayState=${option.value}`;
 
         window.location.href = redirUrl;
       })
