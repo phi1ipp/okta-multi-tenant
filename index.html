@@ -47,7 +47,8 @@
             console.log('groups', filteredGrps)
 
             const options = 
-                await filteredGrps.map(async grpName => {
+              Promise.all(
+                filteredGrps.map(async grpName => {
                     const jwt = await new jose.SignJWT({ 'org': true })
                         .setProtectedHeader({ alg })
                         .setIssuedAt()
@@ -57,7 +58,8 @@
                         .sign(secret);
 
                     return `<option value=${jwt}>${grpName}</option>`
-                });
+                }));
+            console.log('options', options)
 
             document.getElementById('groups').innerHTML = 
                 '<select>'
